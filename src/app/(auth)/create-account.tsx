@@ -1,60 +1,213 @@
 
-import { ThemedView } from "@/components/themed-view";
-import { Colors } from "@/constants/theme";
-import { router } from 'expo-router';
-import { useState } from "react";
 import {
-  FlatList,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
+import {
   Pressable,
   StyleSheet,
   Text,
   useColorScheme,
   View,
 } from "react-native";
+
+import { Colors } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
+
+const PIN_LENGTH = 4;
+const KEY_SIZE = 72;
+const KEY_GAP = 16;
 
 type KeypadItem = number | "delete" | "empty";
 
-export default function SiginScreen() {
+type ThemeColors = (typeof Colors)[keyof typeof Colors];
+
+const BUTTONS: KeypadItem[] = [
+  1, 2, 3,
+  4, 5, 6,
+  7, 8, 9,
+  "empty", 0, "delete",
+];
+
+function PinDot({
+  filled,
+  colors,
+}: {
+  filled: boolean;
+  colors: ThemeColors;
+}) {
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    scale.value = filled
+      ? withSequence(
+          withSpring(1.3),
+          withSpring(1)
+        )
+      : withTiming(1);
+  }, [filled, scale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        styles.pinDot,
+        {
+          backgroundColor: filled
+            ? colors.text
+            : "transparent",
+          borderColor: filled
+            ? colors.text
+            : colors.text + "50",
+        },
+        animatedStyle,
+      ]}
+    />
+  );
+}
+
+function KeypadButton({
+  item,
+  onPress,
+  disabled,
+  colors,
+}: {
+  item: KeypadItem;
+  onPress: (item: KeypadItem) => void;
+  disabled: boolean;
+  colors: ThemeColors;
+}) {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  if (item === "empty") {
+    return <View style={styles.keyWrapper} />;
+  }
+
+  const isDelete = item === "delete";
+
+  return (
+    <View style={styles.keyWrapper}>
+      <Animated.View style={[styles.keySize, animatedStyle]}>
+        <Pressable
+          onPress={() => onPress(item)}
+          disabled={disabled}
+          onPressIn={() => {
+            scale.value = withSpring(0.92);
+          }}
+          onPressOut={() => {
+            scale.value = withSpring(1);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={
+            isDelete
+              ? "Delete last digit"
+              : `Digit ${item}`
+          }
+          style={({ pressed }) => [
+            styles.key,
+            {
+              borderColor: colors.backgroundElement,
+              backgroundColor: pressed
+                ? colors.backgroundElement
+                : "transparent",
+              opacity: disabled ? 0.45 : 1,
+            },
+          ]}
+        >
+          {isDelete ? (
+            <Ionicons
+              name="backspace-outline"
+              size={25}
+              color={colors.text}
+            />
+          ) : (
+            <Text
+              style={[
+                styles.keyText,
+                { color: colors.text },
+              ]}
+            >
+              {item}
+            </Text>
+          )}
+        </Pressable>
+      </Animated.View>
+    </View>
+  );
+}
+
+export default function CreatePinScreen() {
   const scheme = useColorScheme();
-  const colors = Colors[scheme === "dark" ? "dark" : "light"];
+
+  const colors =
+    Colors[scheme === "dark" ? "dark" : "light"];
 
   const [pin, setPin] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const buttonPress: KeypadItem[] = [
-    1, 2, 3,
-    4, 5, 6,
-    7, 8, 9,
-    "delete", 0, "empty",
-  ];
+  const shake = useSharedValue(0);
 
-  const PIN_LENGTH = 4;
+  const shakeStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shake.value }],
+  }));
 
-  const handlePress = (item: KeypadItem) => {
-    console.log('item', item);
+  const handlePress = useCallback(
+    (item: KeypadItem) => {
+      if (isSubmitting) return;
 
-    if (item === "empty") return;
+      if (item === "empty") return;
 
-    if (item === "delete") {
-      setPin((previousPin) => previousPin.slice(0, -1));
+      if (item === "delete") {
+        setPin((previousPin) =>
+          previousPin.slice(0, -1)
+        );
+        return;
+      }
+
+      setPin((previousPin) =>
+        previousPin.length < PIN_LENGTH
+          ? previousPin + String(item)
+          : previousPin
+      );
+    },
+    [isSubmitting]
+  );
+
+  const handleSignIn = () => {
+    if (pin.length !== PIN_LENGTH || isSubmitting) {
       return;
     }
 
-    if (pin.length < PIN_LENGTH) {
-      setPin((previousPin) => previousPin + String(item));
-    }
-  };
-
-  const handleSignIn = () => {
-    if (pin.length !== PIN_LENGTH) return;
+    setIsSubmitting(true);
 
     console.log("PIN entered", pin);
 
-    router.replace('/(auth)/signin');
+    router.replace("/(auth)/signin");
+
+    setIsSubmitting(false);
   };
 
   return (
-    <ThemedView
+    <View
       style={[
         styles.container,
         { backgroundColor: colors.background },
@@ -62,114 +215,92 @@ export default function SiginScreen() {
     >
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>
+          <Text
+            style={[
+              styles.title,
+              { color: colors.text },
+            ]}
+          >
             Create your PIN
           </Text>
 
-          <Text style={[styles.subtitle, { color: colors.text }]}>
+          <Text
+            style={[
+              styles.subtitle,
+              { color: colors.textSecondary },
+            ]}
+          >
             Set up a secure PIN for your Veltrix account
           </Text>
         </View>
 
         <View style={styles.pinSection}>
-          <View style={styles.pinDisplay}>
-            {Array.from({ length: PIN_LENGTH }, (_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.pinDot,
-                  {
-                    backgroundColor:
-                      index < pin.length
-                        ? colors.text
-                        : "transparent",
-                    borderColor:
-                      index < pin.length
-                        ? colors.text
-                        : colors.text + "50",
-                  },
-                ]}
-              />
-            ))}
-          </View>
+          <Animated.View
+            style={[styles.pinDisplay, shakeStyle]}
+          >
+            {Array.from(
+              { length: PIN_LENGTH },
+              (_, index) => (
+                <PinDot
+                  key={index}
+                  filled={index < pin.length}
+                  colors={colors}
+                />
+              )
+            )}
+          </Animated.View>
 
-          <Text style={[styles.hint, { color: colors.text }]}>
+          <Text
+            style={[
+              styles.hint,
+              { color: colors.textSecondary },
+            ]}
+          >
             Enter your 4-digit PIN
           </Text>
         </View>
 
         <View style={styles.keypadContainer}>
-          <FlatList
-            data={buttonPress}
-            numColumns={3}
-            keyExtractor={(item) => String(item)}
-            scrollEnabled={false}
-            renderItem={({ item }) => {
-              if (item === "empty") {
-                return <View style={styles.keyWrapper} />;
-              }
-
-              return (
-                <View style={styles.keyWrapper}>
-                  <Pressable
-                    onPress={() => handlePress(item)}
-                    disabled={
-                      typeof item === "number" &&
-                      pin.length >= PIN_LENGTH
-                    }
-                    accessibilityRole="button"
-                    accessibilityLabel={
-                      item === "delete"
-                        ? "Delete last digit"
-                        : `Digit ${item}`
-                    }
-
-                    style={({ pressed }) => [
-                      styles.key,
-                      {
-                        borderColor: colors.text + "35",
-                        backgroundColor: pressed
-                          ? colors.text + "12"
-                          : "transparent",
-                        opacity: pressed ? 0.8 : 1,
-                      },
-                    ]}
-
-                  >
-                    <Text
-                      style={[
-                        styles.keyText,
-                        { color: colors.text },
-                      ]}
-                    >
-                      {item === "delete" ? "⌫" : item}
-                    </Text>
-                  </Pressable>
-                </View>
-              );
-            }}
-          />
+          <View style={styles.keypad}>
+            {BUTTONS.map((item, index) => (
+              <KeypadButton
+                key={`${item}-${index}`}
+                item={item}
+                onPress={handlePress}
+                colors={colors}
+                disabled={
+                  isSubmitting ||
+                  (typeof item === "number" &&
+                    pin.length >= PIN_LENGTH)
+                }
+              />
+            ))}
+          </View>
         </View>
 
         <Pressable
           onPress={handleSignIn}
-          disabled={pin.length !== PIN_LENGTH}
+          disabled={
+            pin.length !== PIN_LENGTH || isSubmitting
+          }
+          accessibilityRole="button"
           style={({ pressed }) => [
             styles.signInButton,
             {
               backgroundColor:
                 pin.length === PIN_LENGTH
-                  ? colors.textSecondary
-                  : colors.text + "25",
+                  ? colors.background
+                  : colors.backgroundSelected,
               opacity: pressed ? 0.8 : 1,
             },
           ]}
         >
-          <Text style={styles.signInText}>Sign in</Text>
+          <Text style={styles.signInText}>
+            {isSubmitting ? "Please wait..." : "Continue"}
+          </Text>
         </Pressable>
       </SafeAreaView>
-
-    </ThemedView>
+    </View>
   );
 }
 
@@ -180,7 +311,7 @@ const styles = StyleSheet.create({
 
   safeArea: {
     flex: 1,
-    paddingHorizontal: 0,
+    paddingHorizontal: 24,
     justifyContent: "space-between",
     paddingBottom: 15,
   },
@@ -210,6 +341,7 @@ const styles = StyleSheet.create({
   pinDisplay: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     gap: 22,
     marginBottom: 20,
   },
@@ -232,31 +364,37 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
 
-  keyWrapper: {
-    flex: 1,
-    alignItems: "center",
+  keypad: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "center",
-    marginVertical: 7,
-    // borderRadius: 20
+    columnGap: KEY_GAP,
+    rowGap: 14,
   },
 
+  keyWrapper: {
+    width: KEY_SIZE,
+    height: KEY_SIZE,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  keySize: {
+    width: KEY_SIZE,
+    height: KEY_SIZE,
+  },
 
   key: {
-    width: 72,
-    height: 62,
+    flex: 1,
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: "#80808050",
   },
-
 
   keyText: {
     fontSize: 24,
     fontWeight: "500",
-    borderRadius: 20
   },
 
   signInButton: {
@@ -266,6 +404,7 @@ const styles = StyleSheet.create({
     paddingVertical: 17,
     borderRadius: 16,
     marginTop: 18,
+    borderColor: 'transparent'
   },
 
   signInText: {

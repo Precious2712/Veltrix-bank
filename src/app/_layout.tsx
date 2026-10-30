@@ -30,6 +30,13 @@ export default function TabLayout() {
         />
 
         <Stack.Screen
+          name='home-screen'
+          options={{
+            headerShown: false
+          }}
+        />
+
+        <Stack.Screen
           name='(auth)'
           options={{
             headerShown: false

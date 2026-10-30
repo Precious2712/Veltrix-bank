@@ -25,19 +25,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center',
-    // flexDirection: 'row',
   },
   safeArea: {
     paddingTop: 3,
     flex: 1,
-    // paddingHorizontal: Spacing.four,
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
-    // gap: Spacing.three,
     paddingBottom: 10
-    // maxWidth: MaxContentWidth,
   },
 
 });
