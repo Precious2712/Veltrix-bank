@@ -1,4 +1,5 @@
 
+import { AuthProvider } from '@/useContext/useContext';
 import {
   DarkTheme,
   DefaultTheme,
@@ -16,34 +17,36 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider
-      value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-    >
-      <AnimatedSplashOverlay />
+    <AuthProvider>
+      <ThemeProvider
+        value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+      >
+        <AnimatedSplashOverlay />
 
-      <Stack>
-        <Stack.Screen
-          name='index'
-          options={{
-            headerShown: false
-          }}
-        />
+        <Stack>
+          <Stack.Screen
+            name='index'
+            options={{
+              headerShown: false
+            }}
+          />
 
-        <Stack.Screen
-          name='home-screen'
-          options={{
-            headerShown: false
-          }}
-        />
+          <Stack.Screen
+            name='home-screen'
+            options={{
+              headerShown: false
+            }}
+          />
 
-        <Stack.Screen
-          name='(auth)'
-          options={{
-            headerShown: false
-          }}
-        />
-      </Stack>
+          <Stack.Screen
+            name='(auth)'
+             options={{
+              headerShown: false
+            }}
+          />
+        </Stack>
 
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

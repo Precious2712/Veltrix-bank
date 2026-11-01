@@ -16,7 +16,7 @@ export default function AuthLayout() {
         name="create-account"
         options={{
           title: 'Create Account',
-          headerBackButtonDisplayMode: 'minimal',
+          // headerBackButtonDisplayMode: 'minimal',
         }}
       />
 
@@ -24,7 +24,7 @@ export default function AuthLayout() {
         name="signin"
         options={{
           title: 'signin',
-          headerBackButtonDisplayMode: 'minimal',
+          // headerBackButtonDisplayMode: 'minimal',
         }}
       />
     </Stack>

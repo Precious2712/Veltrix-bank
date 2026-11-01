@@ -15,7 +15,7 @@ export default function HomeScreen() {
     <ThemedView style={[styles.container, { backgroundColor: colors.background }]}>
       <SafeAreaView style={styles.safeArea}>
 
-       <Text>Hello welcome to your dashboard</Text>
+        <Text style={[styles.txt, {  }]}>Hello welcome to your dashboard</Text>
 
       </SafeAreaView>
     </ThemedView>
@@ -36,5 +36,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingBottom: 10
   },
+
+  txt: {
+    color: 'red'
+  }
 
 });

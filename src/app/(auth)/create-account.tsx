@@ -1,11 +1,8 @@
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -13,26 +10,26 @@ import {
   View,
 } from "react-native";
 
-import { Colors } from "@/constants/theme";
-import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSequence,
-  withSpring,
-  withTiming,
 } from "react-native-reanimated";
 
-const PIN_LENGTH = 4;
-const KEY_SIZE = 72;
+import KeypadButton, {
+  type KeypadItem,
+} from "@/components/keppadButton";
+
+import PinDot from "@/components/pinDot";
+
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/useContext/useContext";
+
+const PIN_LENGTH = 7;
 const KEY_GAP = 16;
-
-type KeypadItem = number | "delete" | "empty";
-
-type ThemeColors = (typeof Colors)[keyof typeof Colors];
 
 const BUTTONS: KeypadItem[] = [
   1, 2, 3,
@@ -41,120 +38,6 @@ const BUTTONS: KeypadItem[] = [
   "empty", 0, "delete",
 ];
 
-function PinDot({
-  filled,
-  colors,
-}: {
-  filled: boolean;
-  colors: ThemeColors;
-}) {
-  const scale = useSharedValue(1);
-
-  useEffect(() => {
-    scale.value = filled
-      ? withSequence(
-          withSpring(1.3),
-          withSpring(1)
-        )
-      : withTiming(1);
-  }, [filled, scale]);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  return (
-    <Animated.View
-      style={[
-        styles.pinDot,
-        {
-          backgroundColor: filled
-            ? colors.text
-            : "transparent",
-          borderColor: filled
-            ? colors.text
-            : colors.text + "50",
-        },
-        animatedStyle,
-      ]}
-    />
-  );
-}
-
-function KeypadButton({
-  item,
-  onPress,
-  disabled,
-  colors,
-}: {
-  item: KeypadItem;
-  onPress: (item: KeypadItem) => void;
-  disabled: boolean;
-  colors: ThemeColors;
-}) {
-  const scale = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  if (item === "empty") {
-    return <View style={styles.keyWrapper} />;
-  }
-
-  const isDelete = item === "delete";
-
-  return (
-    <View style={styles.keyWrapper}>
-      <Animated.View style={[styles.keySize, animatedStyle]}>
-        <Pressable
-          onPress={() => onPress(item)}
-          disabled={disabled}
-          onPressIn={() => {
-            scale.value = withSpring(0.92);
-          }}
-          onPressOut={() => {
-            scale.value = withSpring(1);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={
-            isDelete
-              ? "Delete last digit"
-              : `Digit ${item}`
-          }
-          style={({ pressed }) => [
-            styles.key,
-            {
-              borderColor: colors.backgroundElement,
-              backgroundColor: pressed
-                ? colors.backgroundElement
-                : "transparent",
-              opacity: disabled ? 0.45 : 1,
-            },
-          ]}
-        >
-          {isDelete ? (
-            <Ionicons
-              name="backspace-outline"
-              size={25}
-              color={colors.text}
-            />
-          ) : (
-            <Text
-              style={[
-                styles.keyText,
-                { color: colors.text },
-              ]}
-            >
-              {item}
-            </Text>
-          )}
-        </Pressable>
-      </Animated.View>
-    </View>
-  );
-}
-
 export default function CreatePinScreen() {
   const scheme = useColorScheme();
 
@@ -162,7 +45,8 @@ export default function CreatePinScreen() {
     Colors[scheme === "dark" ? "dark" : "light"];
 
   const [pin, setPin] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { createAccount, isSubmitting } = useAuth();
 
   const shake = useSharedValue(0);
 
@@ -170,11 +54,10 @@ export default function CreatePinScreen() {
     transform: [{ translateX: shake.value }],
   }));
 
+  // Handle keypad input
   const handlePress = useCallback(
     (item: KeypadItem) => {
-      if (isSubmitting) return;
-
-      if (item === "empty") return;
+      if (isSubmitting || item === "empty") return;
 
       if (item === "delete") {
         setPin((previousPin) =>
@@ -192,18 +75,55 @@ export default function CreatePinScreen() {
     [isSubmitting]
   );
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (pin.length !== PIN_LENGTH || isSubmitting) {
       return;
     }
 
-    setIsSubmitting(true);
+    try {
+      const data = await createAccount(pin);
 
-    console.log("PIN entered", pin);
+      console.log("Account created:", data);
 
-    router.replace("/(auth)/signin");
+      Alert.alert(
+        "Account created successfully",
+        `Your Veltrix ID is ${data.veltrixId}`,
+        [
+          {
+            text: "Continue",
+            onPress: () => {
+              router.replace({
+                pathname: "/(auth)/signin",
+                params: {
+                  veltrixId: data.veltrixId,
+                },
+              });
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error("Registration error:", error);
 
-    setIsSubmitting(false);
+      if (axios.isAxiosError<{ message?: string | string[] }>(error)) {
+        const message = error.response?.data?.message;
+
+        Alert.alert(
+          "Registration failed",
+          Array.isArray(message)
+            ? message.join("\n")
+            : message ??
+            (error.code === "ERR_NETWORK"
+              ? "Unable to connect to the server. Check your API address and network."
+              : "Something went wrong. Please try again.")
+        );
+      } else {
+        Alert.alert(
+          "Registration failed",
+          "An unexpected error occurred."
+        );
+      }
+    }
   };
 
   return (
@@ -214,6 +134,7 @@ export default function CreatePinScreen() {
       ]}
     >
       <SafeAreaView style={styles.safeArea}>
+
         <View style={styles.header}>
           <Text
             style={[
@@ -234,6 +155,7 @@ export default function CreatePinScreen() {
           </Text>
         </View>
 
+        
         <View style={styles.pinSection}>
           <Animated.View
             style={[styles.pinDisplay, shakeStyle]}
@@ -256,10 +178,11 @@ export default function CreatePinScreen() {
               { color: colors.textSecondary },
             ]}
           >
-            Enter your 4-digit PIN
+            Enter your 7-digit PIN
           </Text>
         </View>
 
+        
         <View style={styles.keypadContainer}>
           <View style={styles.keypad}>
             {BUTTONS.map((item, index) => (
@@ -278,6 +201,7 @@ export default function CreatePinScreen() {
           </View>
         </View>
 
+        
         <Pressable
           onPress={handleSignIn}
           disabled={
@@ -289,7 +213,7 @@ export default function CreatePinScreen() {
             {
               backgroundColor:
                 pin.length === PIN_LENGTH
-                  ? colors.background
+                  ? colors.backgroundElement
                   : colors.backgroundSelected,
               opacity: pressed ? 0.8 : 1,
             },
@@ -299,6 +223,7 @@ export default function CreatePinScreen() {
             {isSubmitting ? "Please wait..." : "Continue"}
           </Text>
         </Pressable>
+
       </SafeAreaView>
     </View>
   );
@@ -346,13 +271,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  pinDot: {
-    width: 15,
-    height: 15,
-    borderRadius: 8,
-    borderWidth: 1.5,
-  },
-
   hint: {
     fontSize: 14,
     opacity: 0.65,
@@ -372,31 +290,6 @@ const styles = StyleSheet.create({
     rowGap: 14,
   },
 
-  keyWrapper: {
-    width: KEY_SIZE,
-    height: KEY_SIZE,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  keySize: {
-    width: KEY_SIZE,
-    height: KEY_SIZE,
-  },
-
-  key: {
-    flex: 1,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-  },
-
-  keyText: {
-    fontSize: 24,
-    fontWeight: "500",
-  },
-
   signInButton: {
     width: "100%",
     alignItems: "center",
@@ -404,11 +297,11 @@ const styles = StyleSheet.create({
     paddingVertical: 17,
     borderRadius: 16,
     marginTop: 18,
-    borderColor: 'transparent'
+    borderColor: "transparent",
   },
 
   signInText: {
-    color: "#FFFFFF",
+    color: "#424242",
     fontSize: 16,
     fontWeight: "700",
   },
