@@ -372,52 +372,6 @@ const styles = StyleSheet.create({
     rowGap: TILE_GAP,
   },
 
-  // tile: {
-  //   height: 132,
-  //   padding: 16,
-  //   borderRadius: 23,
-  //   overflow: "hidden",
-  //   justifyContent: "space-between",
-  // },
-
-  // tileRing: {
-  //   position: "absolute",
-  //   right: -26,
-  //   top: -26,
-  //   width: 90,
-  //   height: 90,
-  //   borderRadius: 45,
-  //   borderWidth: 16,
-  // },
-
-  // wordmark: {
-  //   fontSize: 30,
-  //   lineHeight: 36,
-  //   fontWeight: "800",
-  //   letterSpacing: -0.5,
-  // },
-
-  // tileFooter: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   justifyContent: "space-between",
-  // },
-
-  // tileLabel: {
-  //   fontSize: 12,
-  //   fontWeight: "700",
-  // },
-
-  // tileArrow: {
-  //   width: 31,
-  //   height: 31,
-  //   borderRadius: 16,
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  // },
-
-
-
   activitySection: {
     gap: 14,
   },
