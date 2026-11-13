@@ -19,7 +19,7 @@ import {
 import { Colors } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Animated, {
@@ -58,7 +58,7 @@ export default function SigninScreen() {
 
   const keySize = height < 720 ? 60 : 72;
 
-  
+
   const { signIn, isSigningIn, veltrixId } = useAuth();
 
   const [pin, setPin] = useState("");
@@ -69,7 +69,7 @@ export default function SigninScreen() {
     transform: [{ translateX: shake.value }],
   }));
 
-  
+
   const fail = useCallback(
     (message: string) => {
       shake.value = withSequence(
@@ -86,7 +86,7 @@ export default function SigninScreen() {
     [shake]
   );
 
-  
+
   const handlePress = useCallback(
     (item: KeypadItem) => {
       if (isSigningIn || item === "empty") {
@@ -112,12 +112,12 @@ export default function SigninScreen() {
     [isSigningIn]
   );
 
-  
+
   const canSubmit =
     pin.length === PIN_LENGTH &&
     Boolean(veltrixId?.trim());
 
- 
+
   const handleSignIn = async () => {
     const formattedId = veltrixId?.trim() ?? "";
 
@@ -204,7 +204,7 @@ export default function SigninScreen() {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            
+
             <View style={styles.header}>
               <View
                 style={[
@@ -243,7 +243,7 @@ export default function SigninScreen() {
               </Text>
             </View>
 
-            
+
             <View style={styles.formSection}>
               <Text
                 style={[
@@ -254,7 +254,7 @@ export default function SigninScreen() {
                 Veltrix ID
               </Text>
 
-              
+
               <View
                 style={[
                   styles.inputContainer,
@@ -289,7 +289,7 @@ export default function SigninScreen() {
                 />
               </View>
 
-              
+
               <Text
                 style={[
                   styles.inputLabel,
@@ -300,7 +300,7 @@ export default function SigninScreen() {
                 {PIN_LENGTH}-digit PIN
               </Text>
 
-              
+
               <Animated.View
                 style={[
                   styles.pinDisplay,
@@ -320,7 +320,7 @@ export default function SigninScreen() {
               </Animated.View>
             </View>
 
-            
+
             <View style={styles.keypadContainer}>
               <View
                 style={[
@@ -352,7 +352,7 @@ export default function SigninScreen() {
             </View>
           </ScrollView>
 
-          
+
           <View style={styles.footer}>
             <Pressable
               onPress={handleSignIn}
@@ -403,6 +403,8 @@ export default function SigninScreen() {
                 Forgot PIN?
               </Text>
             </Pressable>
+
+            <Link href={'/(auth)/signin'}>Don't have an account! sign up</Link>
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>

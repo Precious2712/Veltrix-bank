@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import axios from "axios";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Animated, {
@@ -155,7 +155,7 @@ export default function CreatePinScreen() {
           </Text>
         </View>
 
-        
+
         <View style={styles.pinSection}>
           <Animated.View
             style={[styles.pinDisplay, shakeStyle]}
@@ -182,7 +182,7 @@ export default function CreatePinScreen() {
           </Text>
         </View>
 
-        
+
         <View style={styles.keypadContainer}>
           <View style={styles.keypad}>
             {BUTTONS.map((item, index) => (
@@ -201,7 +201,7 @@ export default function CreatePinScreen() {
           </View>
         </View>
 
-        
+
         <Pressable
           onPress={handleSignIn}
           disabled={
@@ -223,6 +223,8 @@ export default function CreatePinScreen() {
             {isSubmitting ? "Please wait..." : "Continue"}
           </Text>
         </Pressable>
+
+        <Link href={'/(auth)/signin'}>Alredy have an account! sign in</Link>
 
       </SafeAreaView>
     </View>

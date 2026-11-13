@@ -33,7 +33,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSigningIn, setIsSigningIn] = useState(false);
 
-    // CREATE ACCOUNT
     const createAccount = useCallback(async (pin: string) => {
         try {
             setIsSubmitting(true);
@@ -56,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    // SIGN IN
+    
     const signIn = useCallback(
         async (userVeltrixId: string, pin: string) => {
             try {
