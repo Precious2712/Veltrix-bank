@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Onboarding from '@/components/onbooading';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
+import { Link } from 'expo-router';
 import { useColorScheme } from 'react-native';
 
 
@@ -16,6 +17,8 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea}>
 
         <Onboarding />
+
+        <Link href='/'>card</Link>
 
       </SafeAreaView>
     </ThemedView>

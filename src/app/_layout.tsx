@@ -40,7 +40,14 @@ export default function TabLayout() {
 
           <Stack.Screen
             name='(auth)'
-             options={{
+            options={{
+              headerShown: false
+            }}
+          />
+
+          <Stack.Screen
+            name='(provider)'
+            options={{
               headerShown: false
             }}
           />

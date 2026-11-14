@@ -224,7 +224,7 @@ export default function CreatePinScreen() {
           </Text>
         </Pressable>
 
-        <Link href={'/(auth)/signin'}>Alredy have an account! sign in</Link>
+        <Link style={styles.line} href='/(auth)/signin'>Alredy have an account! sign in</Link>
 
       </SafeAreaView>
     </View>
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
 
   safeArea: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     justifyContent: "space-between",
     paddingBottom: 15,
   },
@@ -303,8 +303,14 @@ const styles = StyleSheet.create({
   },
 
   signInText: {
-    color: "#424242",
+    color: "white",
     fontSize: 16,
     fontWeight: "700",
   },
+
+  line: {
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 3
+  }
 });

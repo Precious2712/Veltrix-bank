@@ -18,6 +18,7 @@ import {
   View,
 } from "react-native";
 
+import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const ACCENT = "#4A3DE0";
@@ -43,10 +44,10 @@ export default function HomeScreen() {
   );
 
   const handleSelectNetwork = (id: NetworkId) => {
-    // router.push({
-    //   pathname: "/choose-type",
-    //   params: { network: id },
-    // });
+    router.push({
+      pathname: "/(provider)/network",
+      params: { network: id },
+    });
   };
 
   return (
@@ -296,8 +297,6 @@ const styles = StyleSheet.create({
     gap: 28,
   },
 
-  
-
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -363,8 +362,6 @@ const styles = StyleSheet.create({
     maxWidth: 310,
   },
 
- 
-
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -421,14 +418,12 @@ const styles = StyleSheet.create({
     maxWidth: 250,
   },
 
-  
-
   footer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 7,
-    marginTop: 2,
+    // gap: 7,
+    // marginTop: 2,
   },
 
   footerText: {

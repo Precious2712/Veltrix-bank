@@ -404,7 +404,7 @@ export default function SigninScreen() {
               </Text>
             </Pressable>
 
-            <Link href={'/(auth)/signin'}>Don't have an account! sign up</Link>
+            <Link style={styles.line} href='/(auth)/create-account'>Don't have an account! sign up</Link>
           </View>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -533,4 +533,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
+
+  line: {
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 3
+  }
 });
