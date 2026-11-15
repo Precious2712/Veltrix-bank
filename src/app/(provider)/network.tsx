@@ -20,8 +20,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const ACCENT = "#4A3DE0";
 const ACCENT_ON_DARK = "#9C96FF";
 
-// type ThemeColors = (typeof Colors)[keyof typeof Colors];
-
 const AMOUNT_CHIPS = ["₦100", "₦200", "₦500", "₦1,000"];
 
 const DATA_CHIPS = ["1 GB", "2 GB", "5 GB", "10 GB"];
@@ -35,24 +33,23 @@ export default function ChooseTypeScreen() {
 
     const accent = isDark ? ACCENT_ON_DARK : ACCENT;
 
-    // Get selected network from previous screen
     const { network: networkParam } =
         useLocalSearchParams<{
             network?: string | string[];
         }>();
 
-    // Handle string or array parameters
+    
     const networkId =
         typeof networkParam === "string"
             ? networkParam
             : networkParam?.[0];
 
-    // Find selected network
+    
     const network =
         NETWORKS.find((item) => item.id === networkId) ??
         getNetwork("mtn");
 
-    // Navigate to purchase details
+    
     const goToDetails = (type: "airtime" | "data") => {
         router.push({
             pathname:
@@ -72,7 +69,7 @@ export default function ChooseTypeScreen() {
                 { backgroundColor: colors.background },
             ]}
         >
-            {/* Network background decoration */}
+            
             <View
                 pointerEvents="none"
                 style={[
@@ -86,7 +83,7 @@ export default function ChooseTypeScreen() {
                     contentContainerStyle={styles.content}
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Top navigation */}
+                   
                     <View style={styles.topBar}>
                         <Pressable
                             onPress={() => router.back()}
@@ -119,7 +116,7 @@ export default function ChooseTypeScreen() {
                         <View style={styles.topSpacer} />
                     </View>
 
-                    {/* Progress indicator */}
+                    
                     <View style={styles.progress}>
                         <View style={styles.segments}>
                             <View
@@ -157,7 +154,7 @@ export default function ChooseTypeScreen() {
                         </Text>
                     </View>
 
-                    {/* Selected network */}
+                    
                     <View
                         style={[
                             styles.networkCard,
@@ -223,7 +220,7 @@ export default function ChooseTypeScreen() {
                         </Pressable>
                     </View>
 
-                    {/* Airtime and data choices */}
+                    
                     <View style={styles.choices}>
                         <Text
                             style={[
@@ -234,7 +231,7 @@ export default function ChooseTypeScreen() {
                             What do you want to buy?
                         </Text>
 
-                        {/* Airtime */}
+                        
                         <ChoiceCard
                             title="Airtime"
                             description="Top up any amount, instantly"
@@ -251,7 +248,7 @@ export default function ChooseTypeScreen() {
                             onPress={() => goToDetails("airtime")}
                         />
 
-                        {/* Data */}
+                        
                         <ChoiceCard
                             title="Data bundles"
                             description="Daily, weekly and monthly plans"

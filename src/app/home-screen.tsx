@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SCREEN_PADDING,
     paddingTop: 12,
     paddingBottom: 36,
-    gap: 28,
+    gap: 20,
   },
 
   header: {
