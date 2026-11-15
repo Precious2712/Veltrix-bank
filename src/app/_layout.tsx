@@ -23,7 +23,7 @@ export default function TabLayout() {
         value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
       >
         <AnimatedSplashOverlay />
-        <FloatingMenu/>
+        <FloatingMenu />
 
         <Stack>
           <Stack.Screen
@@ -53,14 +53,22 @@ export default function TabLayout() {
               headerShown: false
             }}
           />
-        </Stack>
 
-        <Stack.Screen
-          name='(tab-bar)'
-          options={{
-            headerShown: false
-          }}
-        />
+          <Stack.Screen
+            name='(tab-bar)'
+            options={{
+              headerShown: false
+            }}
+          />
+
+          <Stack.Screen
+            name='confirm-pin'
+            options={{
+              headerShown: false
+            }}
+          />
+
+        </Stack>
 
       </ThemeProvider>
     </AuthProvider>

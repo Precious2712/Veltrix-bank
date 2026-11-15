@@ -39,7 +39,7 @@ function isNetworkId(value: string): value is NetworkId {
     return NETWORK_IDS.includes(value as NetworkId);
 }
 
-export function BuyDataScreen() {
+export default function BuyDataScreen() {
     const params = useLocalSearchParams<{
         network?: string;
         phone?: string;
