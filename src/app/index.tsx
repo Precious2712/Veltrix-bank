@@ -17,6 +17,8 @@ export default function HomeScreen() {
 
         <Onboarding />
 
+        {/* <FloatingMenu /> */}
+
       </SafeAreaView>
     </ThemedView>
   );

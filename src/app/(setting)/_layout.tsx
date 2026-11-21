@@ -1,7 +1,8 @@
 
+
 import { Stack } from "expo-router";
 
-export default function SelectLayout() {
+export default function SettingsLayout() {
     return (
         <Stack
             screenOptions={{
@@ -9,23 +10,30 @@ export default function SelectLayout() {
             }}
         >
             <Stack.Screen
-                name="network"
+                name="create-pin"
                 options={{
                     headerShown: false,
                 }}
             />
 
             <Stack.Screen
-                name="buy-airtime"
+                name="create-profile"
                 options={{
-                    title: "Buy Airtime",
+                    title: "Create Profile",
                 }}
             />
 
             <Stack.Screen
-                name="buy-data"
+                name="profile"
                 options={{
-                    title: "Buy Data",
+                    title: "Profile",
+                }}
+            />
+
+            <Stack.Screen
+                name="transactions"
+                options={{
+                    title: "Transactions",
                 }}
             />
         </Stack>

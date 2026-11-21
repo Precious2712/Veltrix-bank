@@ -116,7 +116,7 @@ export default function BuyAirtimeScreen() {
         }
 
         router.push({
-            pathname: "/",
+            pathname: "/confirm-pin",
             params: {
                 network: apiNetwork,
                 type: "AIRTIME",

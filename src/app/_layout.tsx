@@ -10,7 +10,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import { FloatingMenu } from '@/components/floating-menu';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,7 +22,6 @@ export default function TabLayout() {
         value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
       >
         <AnimatedSplashOverlay />
-        <FloatingMenu />
 
         <Stack>
           <Stack.Screen
@@ -55,14 +53,14 @@ export default function TabLayout() {
           />
 
           <Stack.Screen
-            name='(tab-bar)'
+            name='confirm-pin'
             options={{
               headerShown: false
             }}
           />
 
           <Stack.Screen
-            name='confirm-pin'
+            name='(setting)'
             options={{
               headerShown: false
             }}

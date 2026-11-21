@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   },
 
   line: {
-    color: 'white',
+    color: '#6C4DFF',
     textAlign: 'center',
     marginTop: 3
   }

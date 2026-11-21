@@ -59,7 +59,7 @@ export default function SigninScreen() {
   const keySize = height < 720 ? 60 : 72;
 
 
-  const { signIn, isSigningIn, veltrixId } = useAuth();
+  const { signIn, isSigningIn, veltrixId, isInitializing } = useAuth();
 
   const [pin, setPin] = useState("");
 
@@ -85,7 +85,6 @@ export default function SigninScreen() {
     },
     [shake]
   );
-
 
   const handlePress = useCallback(
     (item: KeypadItem) => {
@@ -119,9 +118,7 @@ export default function SigninScreen() {
 
 
   const handleSignIn = async () => {
-    const formattedId = veltrixId?.trim() ?? "";
-
-    if (!formattedId) {
+    if (!veltrixId?.trim()) {
       Alert.alert(
         "Veltrix ID required",
         "Your Veltrix ID is unavailable. Please create an account or restore your account details."
@@ -139,14 +136,13 @@ export default function SigninScreen() {
       return;
     }
 
-    if (isSigningIn) {
-      return;
-    }
+    if (isSigningIn) return;
 
     try {
-      await signIn(formattedId, pin);
+      await signIn(pin);
 
       router.replace("/home-screen");
+
     } catch (error) {
       if (__DEV__) {
         console.warn(
@@ -174,12 +170,14 @@ export default function SigninScreen() {
                 : "Unable to sign in. Please try again."
         );
       } else {
-        fail(
-          "An unexpected error occurred. Please try again."
-        );
+        fail("An unexpected error occurred. Please try again.");
       }
     }
   };
+
+  if (isInitializing) {
+    return null;
+  }
 
   return (
     <View

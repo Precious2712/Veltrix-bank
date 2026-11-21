@@ -1,15 +1,17 @@
 
-
 import {
   NETWORKS,
   type NetworkId,
 } from "@/components/data/network";
-import { Colors } from "@/constants/theme";
 
 import { NetworkTile } from "@/components/network/network-title";
+import { SideNav } from "@/components/side-bar-drawer";
+import { Colors } from "@/constants/theme";
+
 import { Ionicons } from "@expo/vector-icons";
 
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -18,7 +20,9 @@ import {
   View,
 } from "react-native";
 
+import { useAuth } from "@/useContext/useContext";
 import { router } from "expo-router";
+import { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const ACCENT = "#4A3DE0";
@@ -28,6 +32,10 @@ const TILE_GAP = 12;
 type ThemeColors = (typeof Colors)[keyof typeof Colors];
 
 export default function HomeScreen() {
+  const [open, setOpen] = useState<boolean>(false);
+
+  const { profileCompleted, veltrixId } = useAuth();
+
   const scheme = useColorScheme();
   const isDark = scheme === "dark";
 
@@ -50,6 +58,10 @@ export default function HomeScreen() {
     });
   };
 
+  const handleNav = () => {
+    setOpen(true);
+  };
+
   return (
     <View
       style={[
@@ -57,6 +69,7 @@ export default function HomeScreen() {
         { backgroundColor: colors.background },
       ]}
     >
+
       <View
         pointerEvents="none"
         style={[
@@ -71,7 +84,7 @@ export default function HomeScreen() {
 
       <SafeAreaView
         style={styles.safeArea}
-        edges={["top"]}
+        edges={["top", "bottom"]}
       >
         <ScrollView
           contentContainerStyle={styles.content}
@@ -88,8 +101,7 @@ export default function HomeScreen() {
                   color="#FFFFFF"
                 />
               </View>
-
-              <View>
+              <Pressable onPress={handleNav}>
                 <Text
                   style={[
                     styles.brandName,
@@ -107,7 +119,7 @@ export default function HomeScreen() {
                 >
                   Your digital experience
                 </Text>
-              </View>
+              </Pressable>
             </View>
 
             <View
@@ -245,36 +257,46 @@ export default function HomeScreen() {
                 appear here.
               </Text>
             </View>
-          </View>
 
 
-          <View style={styles.footer}>
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={15}
-              color={colors.text}
-            />
+            <View style={styles.footer}>
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={15}
+                color={colors.text}
+              />
 
-            <Text
-              style={[
-                styles.footerText,
-                { color: colors.text, opacity: 0.55 },
-              ]}
-            >
-              Secure and reliable transactions
-            </Text>
+              <Text
+                style={[
+                  styles.footerText,
+                  { color: colors.text, opacity: 0.55 },
+                ]}
+              >
+                Secure and reliable transactions
+              </Text>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
+
+      <SideNav
+        visible={open}
+        onClose={() => setOpen(false)}
+        backgroundColor={colors.background}
+        textColor={colors.text}
+        hasProfile={profileCompleted}
+        veltrixId={veltrixId ?? undefined}
+      />
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: "relative",
     overflow: "hidden",
+    paddingBottom: 20,
   },
 
   safeArea: {
@@ -294,7 +316,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SCREEN_PADDING,
     paddingTop: 12,
     paddingBottom: 36,
-    gap: 20,
+    gap: 26,
   },
 
   header: {
@@ -422,8 +444,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    // gap: 7,
-    // marginTop: 2,
+    gap: 7,
+    marginTop: 2,
   },
 
   footerText: {
